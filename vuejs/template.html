@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charaset="utf-8">
+    <title>Vuejs Hands-on</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      {{ message }}
+    </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
+      },
+      mounted(){
+        setTimeout(() => {
+          this.message = 'こんにちは、世界!'
+        },2000)
+      }
+    })
+  </script>
+  </body>
+</html>
