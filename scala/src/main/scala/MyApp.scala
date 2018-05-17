@@ -1,13 +1,20 @@
-class User(val name: String = "taguchi"){
-  def hello(): Unit = println(s"hello $name")
+trait Printable {
+  def print() = println("now printing ...")
 }
+
+trait Sharable {
+  def share() = println("now sharing ...")
+}
+
+class User extends Printable with Sharable
+// class User extends OtherClass with Printable
+
 object MyApp {
 
   def main(args: Array[String]): Unit = {
-    val user: User = new User()
-    user.hello()
-    val helloWorld = 2
-    println("oh.."+helloWorld)
+    val user = new User()
+    user.print()
+    user.share()
   }
 
 }

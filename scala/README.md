@@ -96,7 +96,7 @@
     
 - method    
     - def <メソッド名>: <型> = <式>
-    - 最後に評価された値を返す
+    - *最後に評価された値を返す*
     - 例:引数がない場合
     ```aidl
     def sayHi(): String = { // 返り値がない場合はUnit
@@ -120,6 +120,7 @@
     
 - Class
     - 変数/フィールドとメソッドをもつ
+    - コンストラクタはclassのブロック内に直接書いたやつ
     ```aidl
     class User{
     ...
@@ -136,3 +137,110 @@
         // val name = _name
         def sayHello() = println(s"Hi!" + this.name) // thisは省略可能
     } 
+    
+    - 継承
+        - 例：Userクラスを継承する
+    ```
+    class AdminUser(name: String, val age: Int) extends User(name){ //親の引数つきコンストラクタを呼び出したい場合は，親クラス名の後ろに引数を書く
+        override sayHello() = println(s"[Admin] Hi!"+this.name) // override
+    }
+    ```    
+    
+- package
+    - 相互に関係のあるクラスをまとめる    
+    ```aidl
+    package com.kyou.model
+    class User(){
+    ...
+    } 
+    class AdminUser(){
+    ...
+    } 
+  
+    // 呼び出し 
+    import com.kyou.model._ // 全呼び出し
+    import com.kyou.model.{User, AdminUser} // 複数呼び出し
+    import com.kyou.model.{User => UserK, AdminUser => } // 別名として呼び出す 
+    import com.kyou.model.{User => _,_} // User以外を呼び出す
+    ```
+    
+- アクセス修飾子    
+    - defaultはpublic
+    - private：そのクラスのみ
+    - protected：サブクラスまで
+    
+    ```
+    class User{
+       val name = "yamada" 
+    }
+    class AdminUser extends User{
+       def sayHello(): Unit = println("hello" + name) // Userのnameがprivateだとエラー
+    }
+    object MyApp{
+       def main(): Unit = {
+           val user = new User
+           print(user.name) // nameがpublic以外だとエラー
+       }
+    }
+    ```
+    
+- final修飾子    
+    - classにつけると継承できない
+    - メンバーにつけるとoverride出来ない
+        - valで宣言したインスタンス変数(メンバ変数)はoverrideは出来る
+    ```aidl
+    class User(){
+       val name = "yamada"
+    }
+    class AdminUser() extends User{
+       override val name = "kyoua" // Userのnameがfinalだったらエラー
+    }
+    ```    
+    
+- object
+    - javaでいうstatic   
+    - クラスをインスタンス化せずに、直接メソッドや変数にアクセスできる
+    ```aidl
+    object User{ // コンパニオンオブジェクト
+      def getInfo() = println("User Object")
+      def apply(name: String) = User(name) 
+    }
+    class User(val name: String){ // コンパニオンクラス
+  
+    }
+    
+    object MyApp{
+      def main(){
+          User.getInfo() // 直接呼び出せる
+          val user = User("yamada") // 省略の流れ new User("name") -> User.apply("name")
+          println(user.name) // yamada // printlnはPredefオブジェクト Predef.println()
+      }
+    }
+    ```
+
+- abstract
+    - インスタンス化できない(継承を前提としている)
+    
+- trait
+    - javaのインターフェイス    
+    - 既存のクラスに機能を追加
+    
+    ```aidl
+    trait Sharable{
+      def share() = println("now sharing..")
+    }
+  
+    trait Printable{
+      def print() = println("now printing..")
+    }
+  
+    class User extends Printable with Sharable // 2つ目以降はwith
+  
+  
+    object MyApp{
+      def main(){
+          val user = new User
+          user.print()
+      }
+    }
+    ```
