@@ -228,10 +228,12 @@
     ```aidl
     trait Sharable{
       def share() = println("now sharing..")
+      def getInfo() = println("share")
     }
   
     trait Printable{
       def print() = println("now printing..")
+      def getInfo() = println("print")
     }
   
     class User extends Printable with Sharable // 2つ目以降はwith
@@ -243,4 +245,40 @@
           user.print()
       }
     }
+    ```
+    - メソッド名かぶるとエラー
+        - 対処法1:合成先で合成元をひとつ指定し、override
+        ```aidl
+        class User ~{
+          override getInfo() = super[Printable].getInfo()
+        }
+        ```
+        - 対処法2:共通のtrait作成し、traitをoverride
+        ```aidl
+        trait Common{
+          def getInfo()
+        }
+        trait Printable extends Common{
+          override getInfo() = ~
+        }
+        // 一番最後に呼び出したやつが最終的にoverrideされるやつ 
+        ```
+    
+- 型パラメータ
+    - 型をパラメータ化することが可能    
+    ```aidl
+    class User[T]{
+      def print(i: T): Unit=println(s"$i $i $i")
+    }
+    
+    def main(): Unit={
+      val user = new User[Int]
+    }
+    ```
+    
+- 関数オブジェクト
+    - メソッドなどは変数に代入できないので関数オブジェクトにする    
+    ```aidl
+    val malutFunc = (a: Int,b: Int) => a*b
+    val malutFunc = (_: Int,_: Int) //各引数を1回しか処理でつかわないならこういうふうに書ける
     ```

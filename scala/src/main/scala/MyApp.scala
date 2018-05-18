@@ -2,11 +2,11 @@ trait Printable {
   def print() = println("now printing ...")
 }
 
-trait Sharable {
+trait sharable {
   def share() = println("now sharing ...")
 }
 
-class User extends Printable with Sharable
+class User extends Printable with sharable
 // class User extends OtherClass with Printable
 
 object MyApp {
