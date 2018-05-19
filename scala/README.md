@@ -40,13 +40,17 @@
     println("hello"+123) // hello123
     println("hello" + name) // 結局変数もこう書ける
     ```    
+    - formatも使える
+    ```aidl
+    println("%06.2f".format(10.0)) // 010.00
+    ```
     
 - if文    
     - 値を返す式になっている
     ```aidl
     val score = 90
     val result =
-      if (score > 80) "Great" // 複数行にならない場合一行で書くこと可能
+      if (score > 80) "Great" // 複数行にならない場合一行で書くこと可能 複数なら囲えば
       else if (score > 60) "Great"
       else "so so.."
     println(result) // Great
@@ -101,7 +105,7 @@
     ```aidl
     def sayHi(): String = { // 返り値がない場合はUnit
       "hi!" // return "hi!"と同等
-    
+    }
     def main: Unit = {
       println(sayHi) // hi!
     }
@@ -110,6 +114,7 @@
     ```aidl
     def sayHi(name: String="taguchi", age: Int=23): Unit = { // defaultの値を設定できる
       println(s"hi!" $name, age $age) // return "hi!"と同等
+    }
     
     def main: Unit = {
       sayHi("bob", 35) // hi! bob, age 35
@@ -210,7 +215,7 @@
     }
     
     object MyApp{
-      def main(){
+      def main()={
           User.getInfo() // 直接呼び出せる
           val user = User("yamada") // 省略の流れ new User("name") -> User.apply("name")
           println(user.name) // yamada // printlnはPredefオブジェクト Predef.println()
@@ -281,4 +286,139 @@
     ```aidl
     val malutFunc = (a: Int,b: Int) => a*b
     val malutFunc = (_: Int,_: Int) //各引数を1回しか処理でつかわないならこういうふうに書ける
+    ```
+    - 部分適用
+        - メソッドを関数オブジェクト化したり
+    ```
+    def msg(from: String, to: String, text: String) = "%s -> %s : %s".format(from,to,text)
+    
+    val msgToFkoji = msg(_: String,"fkoji",_: String)
+    println(msgToFkoji("saito","hello")) 
+    
+    val msgToFkoji = _ //msg(_: String, _: String, _: String) // メソッドをそのまま関数化
+    ```
+    
+- カリー化 
+    - 2つの引数をもつ関数を1つの引数を持つ関数に出来る
+    ```
+    val malutFunc = (a: Int) => ((b: Int) => a*b)
+    println(mulutFunc(2)(3))
+    
+    val double = malutFunc(2)
+    println(double(3))
+    ```
+    
+- タプル    
+    - 23個以上は不可
+    ```aidl
+    val tuple = (1,"hello",3.2)
+    println(tuple._1) //1 
+  
+    def swap(a: Int, b: Int) = (b,a)
+    val (x,y) = swap(2,3) 
+    ```
+    
+- リスト List   
+    ```aidl
+    val list = List(100,200,300) // List[Int](100,200,300)
+    // 空から加える
+    var list = List[Int]()
+    list = list :+ 100 
+    list = list :+ 200 
+    list = list :+ 300 
+  
+    // method
+    length 
+    isEmpty
+    head
+    tail //先頭以外
+    scores(1) //200
+    contains(~)
+    
+    ```
+    
+- Set
+    - 順序保持しない、重複含まない    
+    - 集合演算可能
+    ```
+    val answers = Set(5,3,5,2)
+    println(answers) //5 3 5
+    
+    & // 積集合
+    | // 和集合
+    &~ // 差集合
+    ```
+    
+- Map    
+    ```aidl
+    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
+    println(map("taguchi")) //100
+  
+    // methoc
+    contains() // bool
+    getOrElse("taguchi", -1) // 無かったら-1
+    ```
+
+- Immutable Mutable なクラス    
+    ```aidl
+    // Immutable
+    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
+    val map2 = map.updated("taguchi",60)
+  
+    // Mutable
+    val map = scala.collection.mutable.Map("taguchi" -> 100, "yamaguchi" -> 200)
+    map("taguchi") = 60
+    ```
+    
+- Listに適応する関数    
+    ```
+    val list = List(10.0,20.2,30.0)
+    //list.map((n: Double)=>n*1.08)
+    //list.map(n=>n*1.08)
+    list.map(_ * 1.08).filter(_ > 20).foreach(println) // 1回しか使ってないのでプレースホルダーとして
+    ```
+    
+- Case
+    - クラス構造やあフィールド内容でパターンマッチできる    
+    ```aidl
+    case class Point(x: Int, y:Int)
+  
+    val points = List(
+      Point(2,3),
+      Point(0,2),
+      Point(3,9)
+    )
+  
+    points.foreach(_ match{
+      Point(2,3) => println("hello")
+      Point(0,_) => println("こんにちは")
+      Point(x,y) => println("%d, %d".format(x,y))
+    }) 
+    ```
+    
+- Option型    
+    - エラー処理に使う
+    - getメソッドを使う
+    ```aidl
+    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
+    println(map("taguchi")) // Error
+    // containsやgetOrElseでやることもできる 
+    map.get("saito") match { // getはOption型が返ってくるので
+      case some(v) => println(v)
+      case None => println("Non menber")
+    }
+    ```
+    
+- Either型    
+    - エラーの内容も返したい時
+    ```
+    def div(a: Int, b: Int): Either[String, Int] = {
+    if (b == 0) Left("Zero div error!")
+    else Right(a / b)
+    }
+    
+    div(10,0) match{
+        case Right(n) => pritln(n)
+        case Left(s) => pritln(s)
+    }
     ```
