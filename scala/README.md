@@ -1,424 +1,159 @@
-# Scalaのお勉強
+# Scala コップ本 3版
+## 2章
+### 2.2 変数
+- val：immutable 再代入不可
+- var：mutable 再代入可
+```aidl
+val msg: String = "hello"
+```
 
-- Scalaのメリット
-    - オブジェクト指向と関数型の融合
-    - JVM上で動作するので、Javaと互換性有る
-    
-- sbt    
-    - ビルドツール
-    
----    
+### 2.3 関数
+- 基本形
+  - ブロックの最後が返り値
+```aidl
+def max(x: Int, y: Int): Int = {
+  if(x > y){
+    x 
+  }  
+  else{
+    y
+  }  
+}
+```
 
-- 変数
-    - val: 値の再代入不可能
-    - var: 値の再代入可能
-    
-    ```
-    val <変数名>: <型> = <値>
-    // 型推論により型は省略可
-    // Long,Floatは<値>Lなどの表現も可
-    ```
-    
-- 文字列展開
-    - s補完子
-        - 変数を埋め込む時
-    ```aidl
-    val name = "yamada"
-    prinln(s"name: $name") // name: yamada
-    // 式を与えることも可
-    println(s"20 + 5 = ${20 + 5}") //20 + 5 = 25
-    ```
-    - f補完子
-        - フォーマット指定子を使う時
-    ```aidl
-    val name = "yamada"
-    val height = 1.9    
-    println(f"$name%s is $height%2.2f") // yamada is 1.90  
-    // %-2.2fにすると左揃え(デフォは右揃え)
-    - その他
-    println("hello"+"mother") //hellomother
-    println("hello"+123) // hello123
-    println("hello" + name) // 結局変数もこう書ける
-    ```    
-    - formatも使える
-    ```aidl
-    println("%06.2f".format(10.0)) // 010.00
-    ```
-    
-- if文    
-    - 値を返す式になっている
-    ```aidl
-    val score = 90
-    val result =
-      if (score > 80) "Great" // 複数行にならない場合一行で書くこと可能 複数なら囲えば
-      else if (score > 60) "Great"
-      else "so so.."
-    println(result) // Great
-    ```
-    
-- match文
-    - switch文のこと    
-    ```aidl
-    val signal = "red"
-    val result = signal match{
-      case "red" => "stop"
-      case "blue" | "green" => "go" 
-      case "yellow" => "caution"
-      case _ => "wrong signal" //その他
-      // その他の場合に値を受けることも可能
-      case other => s"wrong signal: ${other}"
-    }
-    println(result) // red
-    ```
-    
-- while,do while文    
-    ```aidl
-    while(..){
-    ...
-    }
-    
-    do{
-       
-    } while(..)
-  
-    ```
-    
-- for文    
-    - for(ジェネレータ) 式
-    - yieldで値を返す
-    - toは値を含む,untilは含まない
-    ```aidl
-    for (i <- 0 to 3) println(i)  // 0 1 2 3
-    // ジェネレータは複数可能
-    for (i <- 0 to 3; j <- 0 to 3) println(s"$i, $j") // 0, 0  0, 1...
-    // 条件を書くことも可能 
-    for (i <- 0 to 3; j <- 0 to 3 if i != j ) println(s"$i, $j") // 0, 1  0, 2...
-    // 値を返す yield
-    val result = for (i <- 0 to 3; j <- 0 to 3 if i != j ) yield s"$i, $j"
-    for(el <- result) println(el.getClass)
-    ```
-    
-- method    
-    - def <メソッド名>: <型> = <式>
-    - *最後に評価された値を返す*
-    - 例:引数がない場合
-    ```aidl
-    def sayHi(): String = { // 返り値がない場合はUnit
-      "hi!" // return "hi!"と同等
-    }
-    def main: Unit = {
-      println(sayHi) // hi!
-    }
-    ```
-    - 例:引数ある場合
-    ```aidl
-    def sayHi(name: String="taguchi", age: Int=23): Unit = { // defaultの値を設定できる
-      println(s"hi!" $name, age $age) // return "hi!"と同等
-    }
-    
-    def main: Unit = {
-      sayHi("bob", 35) // hi! bob, age 35
-      sayHi() // hi taguchi, age 23
-      sayHi(age=18, name="steave") // hi steave, age 18
-    }
-    ```
-    
-- Class
-    - 変数/フィールドとメソッドをもつ
-    - コンストラクタはclassのブロック内に直接書いたやつ
-    ```aidl
-    class User{
-    ...
-    }
-    
-    object MyApp{
-      def main() = {
-          val user: User = new User()
-    }
-    ```
-    
-    - コンストラクタ引数をもつ場合
-    class User(val name: String){ // コンストラクタ引数をそのままフィールドにしている
-        // val name = _name
-        def sayHello() = println(s"Hi!" + this.name) // thisは省略可能
-    } 
-    
-    - 継承
-        - 例：Userクラスを継承する
-    ```
-    class AdminUser(name: String, val age: Int) extends User(name){ //親の引数つきコンストラクタを呼び出したい場合は，親クラス名の後ろに引数を書く
-        override sayHello() = println(s"[Admin] Hi!"+this.name) // override
-    }
-    ```    
-    
-- package
-    - 相互に関係のあるクラスをまとめる    
-    ```aidl
-    package com.kyou.model
-    class User(){
-    ...
-    } 
-    class AdminUser(){
-    ...
-    } 
-  
-    // 呼び出し 
-    import com.kyou.model._ // 全呼び出し
-    import com.kyou.model.{User, AdminUser} // 複数呼び出し
-    import com.kyou.model.{User => UserK, AdminUser => } // 別名として呼び出す 
-    import com.kyou.model.{User => _,_} // User以外を呼び出す
-    ```
-    
-- アクセス修飾子    
-    - defaultはpublic
-    - private：そのクラスのみ
-    - protected：サブクラスまで
-    
-    ```
-    class User{
-       val name = "yamada" 
-    }
-    class AdminUser extends User{
-       def sayHello(): Unit = println("hello" + name) // Userのnameがprivateだとエラー
-    }
-    object MyApp{
-       def main(): Unit = {
-           val user = new User
-           print(user.name) // nameがpublic以外だとエラー
-       }
-    }
-    ```
-    
-- final修飾子    
-    - classにつけると継承できない
-    - メンバーにつけるとoverride出来ない
-        - valで宣言したインスタンス変数(メンバ変数)はoverrideは出来る
-    ```aidl
-    class User(){
-       val name = "yamada"
-    }
-    class AdminUser() extends User{
-       override val name = "kyoua" // Userのnameがfinalだったらエラー
-    }
-    ```    
-    
-- object
-    - javaでいうstatic   
-    - クラスをインスタンス化せずに、直接メソッドや変数にアクセスできる
-    ```aidl
-    object User{ // コンパニオンオブジェクト
-      def getInfo() = println("User Object")
-      def apply(name: String) = User(name) 
-    }
-    class User(val name: String){ // コンパニオンクラス
-  
-    }
-    
-    object MyApp{
-      def main()={
-          User.getInfo() // 直接呼び出せる
-          val user = User("yamada") // 省略の流れ new User("name") -> User.apply("name")
-          println(user.name) // yamada // printlnはPredefオブジェクト Predef.println()
-      }
-    }
-    ```
+- 再帰じゃなかったら`結果型`省略可
+- 関数の中身1文なら`{}`省略可
 
-- abstract
-    - インスタンス化できない(継承を前提としている)
-    
-- trait
-    - javaのインターフェイス    
-    - 既存のクラスに機能を追加
-    
-    ```aidl
-    trait Sharable{
-      def share() = println("now sharing..")
-      def getInfo() = println("share")
-    }
-  
-    trait Printable{
-      def print() = println("now printing..")
-      def getInfo() = println("print")
-    }
-  
-    class User extends Printable with Sharable // 2つ目以降はwith
-  
-  
-    object MyApp{
-      def main(){
-          val user = new User
-          user.print()
-      }
-    }
-    ```
-    - メソッド名かぶるとエラー
-        - 対処法1:合成先で合成元をひとつ指定し、override
-        ```aidl
-        class User ~{
-          override getInfo() = super[Printable].getInfo()
-        }
-        ```
-        - 対処法2:共通のtrait作成し、traitをoverride
-        ```aidl
-        trait Common{
-          def getInfo()
-        }
-        trait Printable extends Common{
-          override getInfo() = ~
-        }
-        // 一番最後に呼び出したやつが最終的にoverrideされるやつ 
-        ```
-    
-- 型パラメータ
-    - 型をパラメータ化することが可能    
-    ```aidl
-    class User[T]{
-      def print(i: T): Unit=println(s"$i $i $i")
-    }
-    
-    def main(): Unit={
-      val user = new User[Int]
-    }
-    ```
-    
-- 関数オブジェクト
-    - メソッドなどは変数に代入できないので関数オブジェクトにする    
-    ```aidl
-    val malutFunc = (a: Int,b: Int) => a*b
-    val malutFunc = (_: Int,_: Int) //各引数を1回しか処理でつかわないならこういうふうに書ける
-    ```
-    - 部分適用
-        - メソッドを関数オブジェクト化したり
-    ```
-    def msg(from: String, to: String, text: String) = "%s -> %s : %s".format(from,to,text)
-    
-    val msgToFkoji = msg(_: String,"fkoji",_: String)
-    println(msgToFkoji("saito","hello")) 
-    
-    val msgToFkoji = _ //msg(_: String, _: String, _: String) // メソッドをそのまま関数化
-    ```
-    
-- カリー化 
-    - 2つの引数をもつ関数を1つの引数を持つ関数に出来る
-    ```
-    val malutFunc = (a: Int) => ((b: Int) => a*b)
-    println(mulutFunc(2)(3))
-    
-    val double = malutFunc(2)
-    println(double(3))
-    ```
-    
-- タプル    
-    - 23個以上は不可
-    ```aidl
-    val tuple = (1,"hello",3.2)
-    println(tuple._1) //1 
-  
-    def swap(a: Int, b: Int) = (b,a)
-    val (x,y) = swap(2,3) 
-    ```
-    
-- リスト List   
-    ```aidl
-    val list = List(100,200,300) // List[Int](100,200,300)
-    // 空から加える
-    var list = List[Int]()
-    list = list :+ 100 
-    list = list :+ 200 
-    list = list :+ 300 
-  
-    // method
-    length 
-    isEmpty
-    head
-    tail //先頭以外
-    scores(1) //200
-    contains(~)
-    
-    ```
-    
-- Set
-    - 順序保持しない、重複含まない    
-    - 集合演算可能
-    ```
-    val answers = Set(5,3,5,2)
-    println(answers) //5 3 5
-    
-    & // 積集合
-    | // 和集合
-    &~ // 差集合
-    ```
-    
-- Map    
-    ```aidl
-    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
-    println(map("taguchi")) //100
-  
-    // methoc
-    contains() // bool
-    getOrElse("taguchi", -1) // 無かったら-1
-    ```
+- 省略形
+```aidl
+def max(x: Int, y: Int) = if(x > y) x else y
+```
 
-- Immutable Mutable なクラス    
-    ```aidl
-    // Immutable
-    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
-    val map2 = map.updated("taguchi",60)
+### 2.6 foreach, for
+- scalaちゃんはできるだけ`命令型`ではなく`関数型`で書きたいマン
+- 基本形
+```aidl
+args.foreach((arg: String) => println(arg))
+// foreachに渡されているのは`関数リテラル`
+```
+
+- 関数リテラルが1つの引数をとる1文なら引数を省略できる
+- 省略形
+```aidl
+args.foreach(println)
+```
+
+```aidl
+for(arg <- args)
+  println(arg)
+```
+
+- `arg`は`val`
+
+## 3章
+### 3.1 配列(Array)
+- ミュータブル
+- 基本形(配列の初期化は別)
+```aidl
+val greetStrings: Array[String] = new Array[String](3)
+greetStrings(0) = "hello"
+grretStrings(1) = ","
+grretStrings(2) = "world\n"
+
+greesStrings(0) = "HELLO" // 再代入
+```
+- なんで`val`?
+  - valの参照しているオブジェクトの中身は変わる可能性がある
+```aidl
+for(i <- 0 to 2)
+  print(greetStrings(i))
+``` 
+- `0 to 2`は`(0).to(2)`の省略形 
+- **すべての演算がメソッドの呼び出し**  
+
+
+- 基本形(初期化と定義同時)
+```aidl
+val numNames = Array("zero", "one", "two")
+// Array[String]と推論
+```
+
+### 3.2 リスト(List)
+- イミュータブル
+- 関数型の前提：**メソッドは副作用を持ってはならない**
+  - 言い換えると**イミュータブルである**
   
-    // Mutable
-    val map = scala.collection.mutable.Map("taguchi" -> 100, "yamaguchi" -> 200)
-    map("taguchi") = 60
-    ```
-    
-- Listに適応する関数    
-    ```
-    val list = List(10.0,20.2,30.0)
-    //list.map((n: Double)=>n*1.08)
-    //list.map(n=>n*1.08)
-    list.map(_ * 1.08).filter(_ > 20).foreach(println) // 1回しか使ってないのでプレースホルダーとして
-    ```
-    
-- Case
-    - クラス構造やあフィールド内容でパターンマッチできる    
-    ```aidl
-    case class Point(x: Int, y:Int)
-  
-    val points = List(
-      Point(2,3),
-      Point(0,2),
-      Point(3,9)
-    )
-  
-    points.foreach(_ match{
-      Point(2,3) => println("hello")
-      Point(0,_) => println("こんにちは")
-      Point(x,y) => println("%d, %d".format(x,y))
-    }) 
-    ```
-    
-- Option型    
-    - エラー処理に使う
-    - getメソッドを使う
-    ```aidl
-    val map = Map("taguchi" -> 100, "yamaguchi" -> 200)
-    println(map("taguchi")) // Error
-    // containsやgetOrElseでやることもできる 
-    map.get("saito") match { // getはOption型が返ってくるので
-      case some(v) => println(v)
-      case None => println("Non menber")
-    }
-    ```
-    
-- Either型    
-    - エラーの内容も返したい時
-    ```
-    def div(a: Int, b: Int): Either[String, Int] = {
-    if (b == 0) Left("Zero div error!")
-    else Right(a / b)
-    }
-    
-    div(10,0) match{
-        case Right(n) => pritln(n)
-        case Left(s) => pritln(s)
-    }
-    ```
+- 基本形(初期化と定義同時,別は出来ない)
+```aidl
+val oneTwoThree = List(1, 2, 3)
+```
+
+- リスト同士連結するのは`:::`メソッド
+  - pythonのexpand
+- 新しく先頭に要素追加するのは`::`メソッド
+  - pythonのinsert
+```aidl
+val oneTwo = List(1,2)
+val threeFour = List(3,4)
+val oneTwoThreeFour = oneTwo ::: threeFour
+val oneTwoThreee = 3 :: oneTwo
+```
+- メソッドの最後が`:`は右被演算子から呼び出される
+  - `oneTwo.::(3)`
+
+### 3.3 タプル
+- イミュータブル 
+- 異なる型の要素もてる()
+```aidl
+val pair = (99, "hello")
+println(pair._1)
+```
+- 最大22の要素
+- 要素番号1〜なの注意
+
+### 3.4 集合(Set)とマップ(Map)
+- イミュータブルなものとミュータブルなもの存在
+```aidl
+var jetSet = Set("Boeing", "Airbus")
+jetSet += "Lear"
+println(jetSet.contains("Cessna")) //jetSet("Cessna")
+
+```
+
+```aidl
+// ミュータブルは以下をimport
+import scala.collection.mutable
+val jetSet = mutable.Set[String]()
+jetSet += "Boeing"
+jetSet += "Airbus"
+```
+- イミュータブルな場合の`+=`は本来の意味ではない
+  - `jetSet = jetSet + "Lear"`ただ再代入してるだけ
+TODO: HASH系とは  
+
+- イミュータブルなものとミュータブルなもの存在
+```aidl
+val romanNumeral = Map(
+  1 -> "I", 2 -> "II"
+)
+println(romanNumeral(1))
+
+// ミュータブルは以下をimport
+import scala.collection.mutable
+```
+
+### 3.5 関数型のスタイルを見分ける 
+```aidl
+def printArgs(args: Array[String]): Unit = {
+  var i = 0
+  for(i < args.length){
+    println(args(i))
+    i += 1
+  }
+}
+```
+は返却値`Unit`なのに標準出力にしゅつりょくするという副作用を持つ
+以下が副作用をもたないように変更したもの
+```aidl
+def formatArgs(args: Array[String]): Unit = args.mkString("\n")
+```
