@@ -1,4 +1,7 @@
 # Scala コップ本 3版
+
+## 共通
+`式`は評価した時、結果値がある
 ## 2章
 ### 2.2 変数
 - val：immutable 再代入不可
@@ -52,11 +55,11 @@ for(arg <- args)
 
 ## 3章
 ### 3.1 配列(Array)
-- ミュータブル
+- *ミュータブル*
 - 基本形(配列の初期化は別)
 ```aidl
 val greetStrings: Array[String] = new Array[String](3)
-greetStrings(0) = "hello"
+greetStrings(0) = "hello" // greetStrings.update(0, "hello")
 grretStrings(1) = ","
 grretStrings(2) = "world\n"
 
@@ -78,10 +81,13 @@ val numNames = Array("zero", "one", "two")
 // Array[String]と推論
 ```
 
+
 ### 3.2 リスト(List)
-- イミュータブル
+- *イミュータブル*
 - 関数型の前提：**メソッドは副作用を持ってはならない**
   - 言い換えると**イミュータブルである**
+- `Array`との違い  
+  - イミュータブル
   
 - 基本形(初期化と定義同時,別は出来ない)
 ```aidl
@@ -97,6 +103,7 @@ val oneTwo = List(1,2)
 val threeFour = List(3,4)
 val oneTwoThreeFour = oneTwo ::: threeFour
 val oneTwoThreee = 3 :: oneTwo
+val onewTwoThree = 1 :: 2 :: 3 :: Nil //数珠つなぎ
 ```
 - メソッドの最後が`:`は右被演算子から呼び出される
   - `oneTwo.::(3)`
@@ -112,9 +119,9 @@ println(pair._1)
 - 要素番号1〜なの注意
 
 ### 3.4 集合(Set)とマップ(Map)
-- イミュータブルなものとミュータブルなもの存在
+- *イミュータブル*なものと*ミュータブル*なもの存在
 ```aidl
-var jetSet = Set("Boeing", "Airbus")
+var jetSet = Set("Boeing", "Airbus") // Setコンパニオンオブジェクトのapplyを呼んでる
 jetSet += "Lear"
 println(jetSet.contains("Cessna")) //jetSet("Cessna")
 
@@ -123,11 +130,11 @@ println(jetSet.contains("Cessna")) //jetSet("Cessna")
 ```aidl
 // ミュータブルは以下をimport
 import scala.collection.mutable
-val jetSet = mutable.Set[String]()
+val jetSet = mutable.Set[String]() 
 jetSet += "Boeing"
 jetSet += "Airbus"
 ```
-- イミュータブルな場合の`+=`は本来の意味ではない
+- イミュータブルな場合(`imutable.Set`)の`+=`は本来の意味ではない
   - `jetSet = jetSet + "Lear"`ただ再代入してるだけ
 TODO: HASH系とは  
 
@@ -157,3 +164,128 @@ def printArgs(args: Array[String]): Unit = {
 ```aidl
 def formatArgs(args: Array[String]): Unit = args.mkString("\n")
 ```
+
+## 4章
+- `scala`のデフォルト修飾子は`public`
+### 4.3 シングルトンオブジェクト
+- 静的メンバーを持てるようにするためのもの
+- `class`と大体同じ構成
+- シングルトンオブジェクトと同じ名前をもつクラス
+  - そのクラスの`コンパニオンオブジェクト`
+  - クラスを`コンパニオンクラス`
+- 同じ名前を持たない  
+  - `スタンドアロンオブジェクト`
+  
+### 4.4 Scalaアプリケーション  
+- Scalaプログラム実行には`main`メソッドをもつ`スタンドアロンオブジェクト`必要
+- エントリーポイントになりうる
+
+*考え方*
+1. `class`を定義 -> これじゃ静的メンバー持てない!
+2. `object`を定義 -> `object.method`でよべるけど、`new`でインスタンス生成出来ないから、値わたせない！
+3. `スタンドアロンシングルトンオブジェクト`を定義 -> それぞれ関連づけないと
+4. コンパイルしてクラスファイル作成 -> HAPPY
+
+## 6章 関数型スタイルのオブジェクト
+### 6.3 オーバーライド
+`java.lang.Object`の`toString`メソッドはデバック情報とか出力する
+```aidl
+class Rational(n: Int, d: Int){
+  override def toString = n + "/" + d
+}
+```
+### 6.4 事前条件
+```aidl
+class Rational(n: Int, d: Int){
+  require(d != 0)
+}
+```
+### 6.11 多重定義
+```aidl
+  def * (that: Rational): Rational =
+    new Rational(numer * that.numer, denom * that.denom)
+  def * (that: Int) =
+    new Rational(numer * that, denom)
+
+```
+
+## 7章
+### 7.2 whileループ
+- `while`や`do-while`は`Unit型 ()`を返す
+  - javaの`void`とは異なる
+### 7.3 for式  
+- フィルタリング
+```aidl
+val filesHere = (new java.io.File(".")).listFiles // Array[java.io.File]
+for(file <- filesHere if file.getName.endsWith(".scala"))
+  println(file)
+```
+
+- 入れ子の反復処理
+  - `for式`に複数のジェネレーター含められる
+```aidl
+def fileLines(file: java.io.File) =
+  scala.io.Source.fromFile(file).getLines().toList //getLines()はIterator[String]を返す
+def grep(pattern: String) =
+  for {
+    file <- filesHere
+    if file.getName.endsWith(".scala")
+    line <- fileLines(file)
+    trimmed = line.trim // 途中で代入も可能
+    if line.trim.matches(pattern)
+  } println(file + ": " + trimmed)
+grep(".*gcd.*")  
+```  
+
+- 新しいコレクションの生成
+  - `for <節> yield <本体>`
+  
+- `break`と`continue`は存在しない  
+### 7.5 match式
+- `match`が値を返す
+- `break`はいらない
+```aidl
+val friend =
+  firstArg match {
+    case "salt" => "pepper"
+    case _ => "huh?"
+  }
+```
+
+### 7.7 変数のスコープ
+```aidl
+val a = 1
+val a = 2 //エラー
+```
+
+```aidl
+val a = 1
+{
+  val a = 2 // 問題ない 外側の変数をシャドウイング
+  {
+    println(a) // 2
+  }
+}
+```
+## 8章
+### 8.5 プレースホルダー
+- 個別の値として 
+```aidl
+val f = _ + _ // エラー(型推論出来ないから)
+val f = _ + 1 // エラー(型推論出来ないから)
+val f = (_: Int) + (_: Int)
+someNumbers.filter(_ > 0)
+```
+- パラメータリスト全体として
+```aidl
+def funcC1(a: Int, b: Int, c: Int) = a + b + c
+val funcC2 = funcC1 _
+val funcC2 = funcC1(1, _: Int, 3)
+val pripri = println _ 
+val pripri = println  // 引数1つのときはプレースホルダーすら書かなくて良い
+```
+## 8.9 末尾再帰
+再帰を`while`にするイメージ
+
+
+
