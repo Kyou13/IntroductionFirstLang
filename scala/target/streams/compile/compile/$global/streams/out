@@ -1,0 +1,31 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/2_3.scala:1:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mdef max(x: Int, y: Int): Int = {[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/2_3.scala:6:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mprintln(max(2,3))[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/9_4.scala:3:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mdef withPrintWriter(file: File)(op: PrintWriter => Unit) = {[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/9_4.scala:13:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mwithPrintWriter([0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/list_3_10.scala:11:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mval lines = "aaa".toList[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/list_3_10.scala:12:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mprintln(lines)[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/list_3_11.scala:3:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mdef widthOfLength(s: String) = s.length.toString.length[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/list_3_11.scala:5:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mif(args.length > 0){[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/sec_2.scala:39:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mvar Normal = Map(1 -> "I", 2 -> "II")[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/kyohei/Documents/introFirstLang/scala/sec_2.scala:40:1: expected class or object definition[0m
+[0m[[0m[31merror[0m] [0m[0mprintln(Normal)[0m
+[0m[[0m[31merror[0m] [0m[0m^[0m
+[0m[[0m[31merror[0m] [0m[0m10 errors found[0m

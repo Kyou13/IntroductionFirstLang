@@ -268,6 +268,39 @@ val a = 1
 }
 ```
 ## 8章
+### 8.2 ローカル関数
+- 名前空間を関数名によって汚さない方法
+  - `private` *java,scala*共通
+  - ローカル関数を使う *scala*
+```aidl
+def processFile(filename: String, width: Int)= {
+  def processLine(line: String) = { // 外側の関数のパラメータにもアクセスできる
+    if (line.length > width)
+      println(filename + ": " + line.trim)
+  }
+  val source = Source.fromFile(filename)
+  for (line <- source.getLines())
+    processLine(line)
+}
+```  
+
+### 8.3 一人前の存在としての関数
+- 関数リテラル
+  - 実行時にインスタンス化すると値としての関数に
+```aidl
+var increase = (x: Int) => x + 1
+
+// 複数文埋め込むことも可能
+increase = (x: Int) => {
+  println("We")
+  println("are")
+  println("here!")
+  x + 1 // 返される値
+}
+```  
+
+- `foreach`,`filter`は引数として関数をとり、コレクションの各要素についてその関数を呼び出す
+
 ### 8.5 プレースホルダー
 - 個別の値として 
 ```aidl
@@ -284,8 +317,125 @@ val funcC2 = funcC1(1, _: Int, 3)
 val pripri = println _ 
 val pripri = println  // 引数1つのときはプレースホルダーすら書かなくて良い
 ```
-## 8.9 末尾再帰
+### 8.7 クロージャー
+- 自由変数(more)を束縛し、関数リテラルから実行時に作られる値としての関数
+  - 変数辞退をつかんでいるため、変更してもキャッチできる
+  - 束縛変数は引数として与えられてるような値
+```aidl
+var more = 10
+val addMore = (x: Int) => x + more
+```
+
+- 以下の場合はクロージャーが作成されたときにアクティブなmoreを参照
+```aidl
+def makeIncreaser(more: Int) = (x: Int) => x + more
+```
+
+### 8.8 関数呼び出しの特殊な携帯
+- `名前付き引数`も`引数のデフォルト値`もある
+
+### 8.9 末尾再帰
 再帰を`while`にするイメージ
 
 
+## 9章
+### 9.1 重複するコードの削減
+- 束縛変数と自由変数をサポートしているおかげ
+```aidl
+object FileMatcher{
+  private def filesHere = (new java.io.File(".")).listFiles
+  private def filesMatching(matcher: String => Boolean) =
+    for (file <- filesHere; if matcher(file.getName))
+      yield file
+  def filesEnding(query: String) =
+    filesMatching(_.endsWith(query))   
+}
+```
+
+### 9.3, 9.4 カリー化
+- 新しい制御構造を作るのに必要
+- 引数1つのメソッド呼び出しでは中括弧使っていい
+  - カリー化使った場合に、見やすい構文になるから
+```aidl
+def withPrintWriter(file: File)(op: PrintWriter => Unit) = {
+  val writer = new PrintWriter(file)
+  try {
+    op(writer)
+  }finally{
+    writer.close()
+  }
+}
+
+val file = new File("data.txt")
+withPrintWriter(file){ writer =>
+  writer.println(new java.util.Date)
+}
+```
+:
+### implicitのひみつ
+- 2つの使い方
+  - 暗黙の型変換,暗黙のパラメータ
+  
+- 暗黙の型変換
+```
+implicit def メソッド名(引数名: 引数の型): 帰り値の型 = 本体
+```
+
+例
+- IntをBooleanに
+```aidl
+implicit def intToBoolean(arg: Int): Boolean = arg != 0
+
+if(1)みたいなことできる
+```
+
+- 最後に顔文字つける
+```aidl
+implicit class RichString(val src: String) {
+  def smile: String = src + ":-)"
+}
+
+// ちなみにこれの省略形
+class RichString(val src: String){
+  def smile: String = src + ":-)"
+}
+implicit def enrichiString(arg: String): RichString = new RichString(arg)
+
+"HELLO".smile
+```
+
+
+### エラー処理
+エラーを表すデータ型
+- *Option*
+  - Some, Noneをもつ
+    - 値が入ってる時Some, 入っていない時None
+```aidl
+val o: Option[String] = Option("hoge")
+// "hoge"がnullだとNone
+```  
+  - メソッド get・isEmpty・isDefined
+  - 関数を適応するmap
+    - 引数に関数リテラル
+```aidl
+Some(3).map(_ * 3)
+```
+  - Noneの場合に値を返すfold  
+  ```
+  n.fold(throw new RuntimeException)(_ * 3)
+  ```
+  - Option型の入れ子を解消 flatten・flatmap
+  ```
+  val v1: Option[Int] = Some(3)
+  val v2: Option[Int] = Some(5)
+  v1.map(i1 => v2.map(i2 => i1 * i2))
+  // Option[Option[Int]] = Some(Some(15)) 入れ子になる
+  v1.map(i1 => v2.map(i2 => i1 * i2)).flatten // 解消
+  // Option[Int] = Some(15)
+  v1.flatMap(i1 => v2.map(i2 => i1 * i2))
+  // Option[Int] = Some(15)
+  ```
+- 
+### Future
+- 非同期処理を行う
 
