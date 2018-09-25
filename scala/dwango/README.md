@@ -57,3 +57,16 @@ class ShowablePair[A <: Show, B <: Show](val a: A, val b: B)
 
 ## 下限境界
 - 型パラメータがどのような型のスーパタイプであるかを指定する
+
+# class
+## case class
+- インスタンス生成時,new省略できる
+- 引数フィールドになる
+- いろいろ便利なメソッド自動生成
+- コンパニオンオブジェクト(同名のobject)が生成される
+  - 例 
+```
+case class Person(name: String, age: Int)
+
+val curried = Person.curried // コンパニオンオブジェクトが生成されるからこれできる
+```
